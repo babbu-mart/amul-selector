@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Amul Ice Cream Selection (No Prices)</title>
+    <style>
+        body{font-family:sans-serif;margin:40px;}
+        h2{color:#0b4d63;background:#e3f6fb;padding:10px;border-radius:5px;}
+        section{margin-bottom:32px;}
+        .product-list{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+        .item{padding:16px;border:1px solid #eee;border-radius:8px;background:#f7f9fa;display:flex;align-items:center;gap:8px;}
+        .checkbox{width:20px;height:20px;}
+        .quantity-input{width:50px;padding:4px;}
+        .product-info{flex-grow:1;}
+        .btn{margin:16px 0;background:#059;text-decoration:none;color:#fff;padding:14px 24px;border-radius:6px;font-weight:bold;font-size:18px;border:none;cursor:pointer;}
+    </style>
+</head>
+<body>
+    <h1>Amul Ice Cream Full Range (2025)</h1>
+    <p>Select products and <b>export selected items to WhatsApp</b>!</p>
+
+    <form id="iceCreamForm">
+        <div id="sections"></div>
+        <button type="button" class="btn" onclick="exportToWhatsapp()">Export Selected to WhatsApp</button>
+    </form>
+
+    <script>
+    // Full dataset without prices
+    const iceCreamData = [
+        {"category":"Tricone/Cone (120ml)","name":"Butterscotch Tricone","size":"120ml"},
+        {"category":"Tricone/Cone (120ml)","name":"Choco Crunch Tricone","size":"120ml"},
+        {"category":"Tricone/Cone (120ml)","name":"Two in One Tricone","size":"120ml"},
+        {"category":"Tricone/Cone (120ml)","name":"Black Currant Tricone","size":"120ml"},
+        {"category":"Tricone/Cone (120ml)","name":"Cookie Crunch Delight","size":"120ml"},
+        {"category":"Tricone/Cone (120ml)","name":"Choco Vanilla Tricone","size":"120ml"},
+        {"category":"Tricone/Cone (120ml)","name":"Pista Badam Tricone","size":"120ml"},
+        {"category":"Tricone/Cone (120ml)","name":"Belgian Chocolate Tricone","size":"120ml"},
+        {"category":"Cups (65ml-125ml)","name":"Alphonso Mango Cup","size":"100ml"},
+        {"category":"Cups (65ml-125ml)","name":"Rajbhog Cup","size":"125ml"},
+        {"category":"Cups (65ml-125ml)","name":"Strawberry & Cheese Sundae","size":"125ml"},
+        {"category":"Cups (65ml-125ml)","name":"King Alphonso Cup","size":"125ml"},
+        {"category":"Cups (65ml-125ml)","name":"Sugar Free Shahi Anjeer","size":"125ml"},
+        {"category":"Cups (65ml-125ml)","name":"Sugar Free Vanilla","size":"125ml"},
+        {"category":"Cups (65ml-125ml)","name":"Butterscotch Bliss Cup","size":"125ml"},
+        {"category":"Cups (65ml-125ml)","name":"Chocolate Brownie Cup","size":"125ml"},
+        {"category":"Cups (65ml-125ml)","name":"Fruit N Nut Fantasy Cup","size":"125ml"},
+        {"category":"Cups (65ml-125ml)","name":"Vanilla Cup","size":"65ml"},
+        {"category":"Cups (65ml-125ml)","name":"Strawberry Cup","size":"65ml"},
+        {"category":"Tubs (500ml-1L)","name":"Strawberry & Cheese Sundae","size":"1L"},
+        {"category":"Tubs (500ml-1L)","name":"Strawberry Magic Sundae","size":"1L"},
+        {"category":"Tubs (500ml-1L)","name":"Butterscotch","size":"1L"},
+        {"category":"Tubs (500ml-1L)","name":"Fruit N Nut Fantasy","size":"1L"},
+        {"category":"Tubs (500ml-1L)","name":"Rajbhog","size":"1L"},
+        {"category":"Tubs (500ml-1L)","name":"King Alphonso Gold","size":"1L"},
+        {"category":"Tubs (500ml-1L)","name":"Vanilla Magic","size":"1L"},
+        {"category":"Tubs (500ml-1L)","name":"Chocolate","size":"1L"},
+        {"category":"Tubs (500ml-1L)","name":"Cookies N Cream","size":"1L"},
+        {"category":"Tubs (500ml-1L)","name":"Choco Chips","size":"1L"},
+        {"category":"Tubs (500ml-1L)","name":"Afghan Dry Fruit","size":"1L"},
+        {"category":"Tubs (500ml-1L)","name":"American Nuts","size":"1L"},
+        {"category":"Tubs (500ml-1L)","name":"Chocolate Brownie","size":"1L"},
+        {"category":"Tubs (500ml-1L)","name":"Kesar Pista Royale","size":"1L"},
+        {"category":"Tubs (500ml-1L)","name":"Spanish Saffron & Cream Balls","size":"1L"},
+        {"category":"Bricks (750ml)","name":"Vanilla Magic","size":"750ml"},
+        {"category":"Bricks (750ml)","name":"Afghan Dry Fruit","size":"750ml"},
+        {"category":"Bricks (750ml)","name":"Alphonso Mango","size":"750ml"},
+        {"category":"Bricks (750ml)","name":"American Nuts","size":"750ml"},
+        {"category":"Bricks (750ml)","name":"Black Currant","size":"750ml"},
+        {"category":"Bricks (750ml)","name":"Butterscotch","size":"750ml"},
+        {"category":"Bricks (750ml)","name":"Choco Chips","size":"750ml"},
+        {"category":"Bricks (750ml)","name":"Chocolate","size":"750ml"},
+        {"category":"Bricks (750ml)","name":"Cookies n Cream","size":"750ml"},
+        {"category":"Bricks (750ml)","name":"Cake Magic Dark Chocolate","size":"750ml"},
+        {"category":"Sticks/Kulfi 20 MRP","name":"Chocobar","size":"60ml"},
+        {"category":"Sticks/Kulfi 20 MRP","name":"Kaju","size":"60ml"},
+        {"category":"Sticks/Kulfi 20 MRP","name":"Kaashmiri kesar","size":"60ml"},
+        {"category":"Sticks/Kulfi 20 MRP","name":"Rajasthani Kewda Kulfi","size":"60ml"},
+        {"category":"Sticks/Kulfi 20 MRP","name":"Asli AAM","size":"60ml"},
+        {"category":"Sticks/Kulfi 25 MRP","name":"Badshahi Kulfi","size":"60ml"},
+        {"category":"Sticks/Kulfi 25 MRP","name":"Punjabi Kulfi","size":"60ml"},
+        {"category":"Sticks/Kulfi 30 MRP","name":"Pista","size":"60ml"},
+        {"category":"Sticks/Kulfi 30 MRP","name":"Rajbhog","size":"60ml"},
+        {"category":"Kulfi 10 MRP","name":"Rajwadi","size":"20ml"},
+        {"category":"Kulfi 10 MRP","name":"Rabari","size":"20ml"},
+        {"category":"Kulfi 10 MRP","name":"Chocobar","size":"20ml"},
+        {"category":"Kulfi 10 MRP","name":"Mango Dolly","size":"20ml"},
+        {"category":"Cups 10 MRP","name":"Vanilla","size":"20ml"},
+        {"category":"Cups 10 MRP","name":"Stawberry","size":"20ml"},
+        {"category":"Premium/Special","name":"Dark Frostik","size":"Standard"}
+
+    ];
+
+    function renderSections(){
+        const cats = [...new Set(iceCreamData.map(x=>x.category))];
+        let html = '';
+        cats.forEach(cat=>{
+            html += `<section><h2>${cat}</h2><div class="product-list">`;
+            iceCreamData.filter(x=>x.category===cat).forEach((item,idx)=>{
+                html += `<div class="item">
+                    <input type="checkbox" class="checkbox" id="ck_${cat}_${idx}" data-name="${item.name}" data-cat="${cat}" data-size="${item.size}">
+                    <label class="product-info" for="ck_${cat}_${idx}">
+                        <span><b>${item.name}</b></span><br>
+                        <span>${item.size}</span>
+                    </label>
+                    <input type="number" class="quantity-input" id="qty_${cat}_${idx}" min="1" value="1" disabled title="Enter quantity" />
+                </div>`;
+            });
+            html += '</div></section>';
+        });
+        document.getElementById('sections').innerHTML = html;
+
+        // Enable quantity input when checkbox checked, disable otherwise
+        document.querySelectorAll('.checkbox').forEach(chk=>{
+            chk.addEventListener('change', event=>{
+                const idx = event.target.id.replace('ck_','qty_');
+                const qtyInput = document.getElementById(idx);
+                if(event.target.checked){
+                    qtyInput.disabled = false;
+                    qtyInput.focus();
+                } else {
+                    qtyInput.disabled = true;
+                    qtyInput.value = 1; // reset quantity if unchecked
+                }
+            });
+        });
+    }
+
+    function exportToWhatsapp(){
+        let message = `🍦 Amul Ice Cream Selection\n\n`;
+        const cats = [...new Set(iceCreamData.map(x=>x.category))];
+        let added = false;
+
+        cats.forEach(cat=>{
+            const selected = Array.from(document.querySelectorAll(`.checkbox[data-cat='${cat}']:checked`));
+            if(selected.length>0){
+                message += `⭐ ${cat}\n`;
+                selected.forEach(e=>{
+                    const idx = e.id.replace('ck_','qty_');
+                    const qtyInput = document.getElementById(idx);
+                    const quantity = qtyInput && qtyInput.value > 0 ? qtyInput.value : 1;
+                    message += `• ${e.dataset.name} (${e.dataset.size}) × ${quantity}\n`;
+                });
+                message += `\n`;
+                added = true;
+            }
+        });
+
+        if(!added){
+            alert("Please select at least one product!");
+            return;
+        }
+
+        message += "📱 Amul Ice Cream oreder";
+        let whatsappURL = `https://wa.me/?text=${encodeURIComponent(message)}`;
+        window.open(whatsappURL,'_blank');
+    }
+
+    renderSections();
+    </script>
+</body>
+</html>
